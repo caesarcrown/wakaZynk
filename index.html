@@ -28,52 +28,12 @@
 </head>
 <body class="select-none overflow-x-hidden pb-24">
 
-    <div id="disclaimer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-end justify-center p-4">
-        <div class="bg-[#131924] w-full max-w-md rounded-3xl p-6 border border-gray-800 space-y-6">
-            <div class="flex items-center space-x-3 text-amber-500 text-xl font-bold">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <h2>Важные условия покупки</h2>
-            </div>
-            <div class="space-y-3">
-                <div class="bg-red-950/30 border border-red-900/50 rounded-2xl p-4 flex gap-3">
-                    <i class="fa-solid fa-circle-xmark text-red-400 mt-1"></i>
-                    <div>
-                        <h4 class="font-semibold text-sm text-red-200">Возврата денег нет</h4>
-                        <p class="text-xs text-gray-400 mt-0.5">После покупки возврат денежных средств не производится.</p>
-                    </div>
-                </div>
-                <div class="bg-blue-950/30 border border-blue-900/50 rounded-2xl p-4 flex gap-3">
-                    <i class="fa-solid fa-circle-check text-blue-400 mt-1"></i>
-                    <div>
-                        <h4 class="font-semibold text-sm text-blue-200">Замена только при браке</h4>
-                        <p class="text-xs text-gray-400 mt-0.5">Замена возможна только при подтвержденном браке товара.</p>
-                    </div>
-                </div>
-                <div class="bg-amber-950/30 border border-amber-900/50 rounded-2xl p-4 flex gap-3">
-                    <i class="fa-solid fa-user-shield text-amber-400 mt-1"></i>
-                    <div>
-                        <h4 class="font-semibold text-sm text-amber-200">Покупка только от 18+</h4>
-                        <p class="text-xs text-gray-400 mt-0.5">Нажимая "Хорошо", вы подтверждаете, что вам есть 18 лет.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="flex items-center justify-between bg-[#1a2232] px-4 py-3 rounded-2xl">
-                <span class="text-sm text-gray-300">Не показывать снова</span>
-                <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="dont-show" class="sr-only peer">
-                    <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
-                </label>
-            </div>
-            <button onclick="closeDisclaimer()" class="w-full bg-white text-black font-bold py-4 rounded-2xl text-center active:scale-95 transition-transform cursor-pointer">Хорошо</button>
-        </div>
-    </div>
-
     <header class="p-4 flex items-center justify-between border-b border-gray-900 bg-[#0f131c] sticky top-0 z-30">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center font-bold text-sm tracking-wider shadow-[0_0_15px_rgba(168,85,247,0.4)]">WAKA</div>
             <div>
                 <h1 class="font-bold text-base tracking-wide">WAKA ENERGY</h1>
-                <p class="text-xs text-gray-400">топовый завоз в сомах</p>
+                <p class="text-xs text-gray-400">мини-приложение</p>
             </div>
         </div>
         <button onclick="toggleCart()" class="relative w-10 h-10 rounded-xl bg-[#171e2c] flex items-center justify-center text-gray-300 active:scale-95 transition-transform cursor-pointer">
@@ -91,10 +51,10 @@
             <div id="cart-items" class="flex-1 overflow-y-auto space-y-3 pr-1"></div>
             <div class="border-t border-gray-800 mt-4 pt-4 space-y-4">
                 <div class="flex justify-between font-bold text-lg">
-                    <span>Итого к оплате:</span>
+                    <span>Итого по товарам:</span>
                     <span><span id="cart-total">0</span> сом</span>
                 </div>
-                <button onclick="checkout()" class="w-full bg-purple-600 font-bold py-4 rounded-2xl text-center cursor-pointer">Оформить заказ</button>
+                <button onclick="openOrderCheckout()" class="w-full bg-purple-600 font-bold py-4 rounded-2xl text-center cursor-pointer active:scale-98 transition-transform">Перейти к оформлению</button>
             </div>
         </div>
     </div>
@@ -117,8 +77,7 @@
 
             <div class="space-y-2">
                 <h3 class="text-sm font-bold text-gray-300">Выберите вкус</h3>
-                <div id="flavors-grid" class="grid grid-cols-2 gap-2">
-                    </div>
+                <div id="flavors-grid" class="grid grid-cols-2 gap-2"></div>
             </div>
 
             <div class="flex items-center justify-between bg-[#0b0e14] p-4 rounded-2xl border border-gray-900">
@@ -131,10 +90,62 @@
             </div>
 
             <div class="flex gap-2 pt-2">
-                <button id="detail-buy-btn" onclick="addSelectedToCart()" class="flex-1 bg-purple-600 disabled:bg-gray-800 disabled:text-gray-500 text-white font-bold py-4 rounded-2xl cursor-pointer text-center transition-all">
+                <button id="detail-buy-btn" onclick="addSelectedToCart()" class="w-full bg-purple-600 disabled:bg-gray-800 disabled:text-gray-500 text-white font-bold py-4 rounded-2xl cursor-pointer text-center transition-all">
                     <i class="fa-solid fa-shopping-cart mr-2"></i>В корзину
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="checkout-back" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-end justify-center" onclick="closeCheckout(event)">
+        <div id="checkout-sheet" class="bottom-sheet bg-[#131924] w-full max-w-md rounded-t-3xl border-t border-gray-800 p-6 space-y-5 overflow-y-auto max-h-[95vh]" onclick="event.stopPropagation()">
+            <div class="w-12 h-1 bg-gray-700 rounded-full mx-auto mb-2" onclick="closeCheckoutForce()"></div>
+            
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold tracking-wide">Оформление заказа</h2>
+                <button onclick="closeCheckoutForce()" class="w-8 h-8 rounded-full bg-[#1e2638] flex items-center justify-center text-gray-400">&times;</button>
+            </div>
+
+            <div class="space-y-1">
+                <input type="tel" id="checkout-phone" value="+996" class="w-full bg-[#121824] border border-pink-500/40 rounded-xl py-3.5 px-4 text-base font-medium text-white focus:outline-none focus:border-purple-500 transition-all">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-location-dot"></i> Адрес доставки</label>
+                <input type="text" id="checkout-address" placeholder="Введите адрес" class="w-full bg-[#171e2c] border border-gray-800 rounded-xl py-3.5 px-4 text-sm text-white focus:outline-none focus:border-purple-500">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-calendar-days"></i> Дата</label>
+                <div id="checkout-date-box" class="w-full bg-[#171e2c] border border-gray-800 rounded-xl py-3.5 px-4 text-sm text-white font-medium">
+                    </div>
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5"><i class="fa-solid fa-clock"></i> Время</label>
+                <div id="checkout-time-box" class="w-full bg-[#171e2c] border border-gray-800 rounded-xl py-3.5 px-4 text-sm text-white font-medium text-center">
+                    </div>
+            </div>
+
+            <div class="bg-[#0b0e14] p-4 rounded-2xl border border-gray-900 space-y-2.5">
+                <div class="flex justify-between text-sm text-gray-400">
+                    <span>Товары</span>
+                    <span class="text-white font-medium"><span id="summary-subtotal">0</span> сом</span>
+                </div>
+                <div class="flex justify-between text-sm text-gray-400">
+                    <span class="flex items-center gap-1"><i class="fa-solid fa-rotate-left text-xs"></i> Скидка колеса</span>
+                    <span class="text-emerald-400 font-medium">-<span id="summary-discount">0</span> сом</span>
+                </div>
+                <div class="border-t border-gray-900 my-1"></div>
+                <div class="flex justify-between items-baseline">
+                    <span class="font-bold text-base">Итого</span>
+                    <span class="text-xl font-black text-white"><span id="summary-total">0</span> сом</span>
+                </div>
+            </div>
+
+            <button onclick="submitOrderFinal()" class="w-full bg-[#273043] hover:bg-purple-600 text-gray-300 hover:text-white font-bold py-4 rounded-2xl cursor-pointer text-center transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check"></i> Подтвердить заказ
+            </button>
         </div>
     </div>
 
@@ -166,52 +177,20 @@
             <h3 class="text-sm font-bold text-gray-400 px-1">Возможные призы:</h3>
             <div class="space-y-3">
                 <div class="flex items-center justify-between bg-[#171e2c] p-2.5 rounded-xl">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-yellow-600/20 border border-yellow-600/30 flex items-center justify-center text-yellow-500 text-xs font-bold">50</div>
-                        <span class="text-sm font-bold">50 сом</span>
-                    </div>
-                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]">
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-purple-600 h-full rounded-full" style="width: 65%"></div>
-                        </div>
-                        <span class="text-xs text-gray-400 font-bold min-w-8 text-right">65%</span>
-                    </div>
+                    <div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xs font-bold">50</div><span class="text-sm font-bold">50 сом</span></div>
+                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]"><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-purple-600 h-full rounded-full" style="width: 65%"></div></div><span class="text-xs text-gray-400 font-bold min-w-8 text-right">65%</span></div>
                 </div>
                 <div class="flex items-center justify-between bg-[#171e2c] p-2.5 rounded-xl">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-600/30 flex items-center justify-center text-blue-400 text-xs font-bold">100</div>
-                        <span class="text-sm font-bold">100 сом</span>
-                    </div>
-                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]">
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-purple-600 h-full rounded-full" style="width: 20%"></div>
-                        </div>
-                        <span class="text-xs text-gray-400 font-bold min-w-8 text-right">20%</span>
-                    </div>
+                    <div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xs font-bold">100</div><span class="text-sm font-bold">100 сом</span></div>
+                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]"><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-purple-600 h-full rounded-full" style="width: 20%"></div></div><span class="text-xs text-gray-400 font-bold min-w-8 text-right">20%</span></div>
                 </div>
                 <div class="flex items-center justify-between bg-[#171e2c] p-2.5 rounded-xl">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-600/30 flex items-center justify-center text-purple-400 text-xs font-bold">300</div>
-                        <span class="text-sm font-bold">300 сом</span>
-                    </div>
-                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]">
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-purple-600 h-full rounded-full" style="width: 10%"></div>
-                        </div>
-                        <span class="text-xs text-gray-400 font-bold min-w-8 text-right">10%</span>
-                    </div>
+                    <div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xs font-bold">300</div><span class="text-sm font-bold">300 сом</span></div>
+                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]"><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-purple-600 h-full rounded-full" style="width: 10%"></div></div><span class="text-xs text-gray-400 font-bold min-w-8 text-right">10%</span></div>
                 </div>
                 <div class="flex items-center justify-between bg-[#171e2c] p-2.5 rounded-xl">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 rounded-lg bg-red-600/20 border border-red-600/30 flex items-center justify-center text-red-400 text-xs font-bold">500</div>
-                        <span class="text-sm font-bold">500 сом</span>
-                    </div>
-                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]">
-                        <div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-amber-500 h-full rounded-full" style="width: 5%"></div>
-                        </div>
-                        <span class="text-xs text-gray-400 font-bold min-w-8 text-right">5%</span>
-                    </div>
+                    <div class="flex items-center space-x-3"><div class="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xs font-bold">500</div><span class="text-sm font-bold">500 сом</span></div>
+                    <div class="flex items-center space-x-2 flex-1 justify-end max-w-[60%]"><div class="w-full bg-gray-800 h-2 rounded-full overflow-hidden"><div class="bg-amber-500 h-full rounded-full" style="width: 5%"></div></div><span class="text-xs text-gray-400 font-bold min-w-8 text-right">5%</span></div>
                 </div>
             </div>
         </div>
@@ -227,7 +206,7 @@
         </div>
         <div class="bg-[#121824] p-5 rounded-2xl border border-gray-900 flex justify-between items-center">
             <div>
-                <p class="text-xs text-gray-400">Ваш баланс</p>
+                <p class="text-xs text-gray-400">Ваш баланс (бонусные сомы)</p>
                 <p class="text-3xl font-black mt-1"><span id="user-balance">0</span> <span class="text-sm font-normal text-gray-400">сом</span></p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-purple-950/50 flex items-center justify-center text-purple-400 text-lg"><i class="fa-solid fa-wallet"></i></div>
@@ -247,23 +226,11 @@
         let currentBalance = parseInt(localStorage.getItem('waka_balance')) || 0;
         let cart = JSON.parse(localStorage.getItem('waka_cart')) || [];
         
-        // Переменные для текущего открытого товара
         let currentProduct = null;
         let selectedFlavor = null;
         let currentDetailQty = 1;
 
         document.getElementById('user-balance').innerText = currentBalance;
-
-        if (localStorage.getItem('hideDisclaimer') === 'true') {
-            document.getElementById('disclaimer').classList.add('hidden');
-        }
-
-        function closeDisclaimer() {
-            if (document.getElementById('dont-show').checked) {
-                localStorage.setItem('hideDisclaimer', 'true');
-            }
-            document.getElementById('disclaimer').classList.add('hidden');
-        }
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const user = tg.initDataUnsafe.user;
@@ -282,12 +249,10 @@
             document.getElementById('tab-' + tabName).classList.remove('hidden');
             document.getElementById('btn-' + tabName).classList.add('active-tab');
             
-            if (tabName === 'bonuses') {
-                checkWheelTimer();
-            }
+            if (tabName === 'bonuses') checkWheelTimer();
         }
 
-        // ДАННЫЕ СТРОГО ИЗ ТВОЕГО СКРИНШОТА ПОД ВКУСАМ
+        // ДАННЫЕ ИЗ ТВОЕГО МАКЕТА
         const products = [
             { 
                 id: 1, 
@@ -316,6 +281,7 @@
 
         function renderProducts() {
             const grid = document.getElementById('catalog-grid');
+            if (!grid) return;
             grid.innerHTML = '';
             document.getElementById('product-count').innerText = `${products.length} товара`;
 
@@ -352,29 +318,27 @@
             selectedFlavor = null;
             currentDetailQty = 1;
             document.getElementById('detail-qty').innerText = currentDetailQty;
-
             document.getElementById('detail-name').innerText = currentProduct.name;
             document.getElementById('detail-price').innerText = currentProduct.price;
-            document.getElementById('detail-old-price').innerText = currentProduct.oldPrice + " сом";
+            if (document.getElementById('detail-old-price')) {
+                document.getElementById('detail-old-price').innerText = currentProduct.oldPrice + " сом";
+            }
             
             const totalStock = getTotalStock(currentProduct);
             document.getElementById('detail-status').innerText = `🟢 В наличии: ${totalStock} шт.`;
 
-            // Рендерим вкусы точь-в-точь по сетке
             const flavorsGrid = document.getElementById('flavors-grid');
-            flavorsGrid.innerHTML = '';
-            
-            currentProduct.flavors.forEach((f, index) => {
-                flavorsGrid.innerHTML += `
-                    <button id="flavor-btn-${index}" onclick="selectFlavor('${f.name}', ${index}, ${f.stock})" class="flavor-btn bg-[#171e2c] border border-gray-800 rounded-xl p-3 text-center flex flex-col justify-center items-center active:scale-95 transition-all cursor-pointer">
-                        <span class="text-sm font-bold text-white">${f.name}</span>
-                        <span class="text-[10px] text-gray-400 mt-0.5">${f.stock} шт.</span>
-                    </button>
-                `;
-            });
-
+            if (flavorsGrid) {
+                flavorsGrid.innerHTML = '';
+                currentProduct.flavors.forEach((f, index) => {
+                    flavorsGrid.innerHTML += `
+                        <button id="flavor-btn-${index}" onclick="selectFlavor('${f.name}', ${index}, ${f.stock})" class="flavor-btn bg-[#171e2c] border border-gray-800 rounded-xl p-3 text-center flex flex-col justify-center items-center active:scale-95 transition-all cursor-pointer">
+                            <span class="text-sm font-bold text-white">${f.name}</span>
+                            <span class="text-[10px] text-gray-400 mt-0.5">${f.stock} шт.</span>
+                        </button>`;
+                });
+            }
             updateBuyButtonState();
-
             document.getElementById('details-back').classList.remove('hidden');
             setTimeout(() => { document.getElementById('details-sheet').classList.add('active'); }, 10);
         }
@@ -386,8 +350,8 @@
             document.getElementById('detail-qty').innerText = currentDetailQty;
 
             document.querySelectorAll('.flavor-btn').forEach(btn => btn.classList.remove('selected'));
-            document.getElementById(`flavor-btn-${index}`).classList.add('selected');
-            
+            const selectedBtn = document.getElementById(`flavor-btn-${index}`);
+            if (selectedBtn) selectedBtn.classList.add('selected');
             updateBuyButtonState();
         }
 
@@ -402,6 +366,7 @@
 
         function updateBuyButtonState() {
             const btn = document.getElementById('detail-buy-btn');
+            if (!btn) return;
             if (selectedFlavor) {
                 btn.disabled = false;
                 btn.innerText = `Добавить в корзину (${currentDetailQty} шт.)`;
@@ -413,26 +378,14 @@
 
         function addSelectedToCart() {
             if (!currentProduct || !selectedFlavor) return;
-            
-            // Ищем, есть ли уже такой товар с ТАКИМ ЖЕ вкусом в корзине
             const existingItem = cart.find(item => item.id === currentProduct.id && item.flavor === selectedFlavor.name);
-            
             if (existingItem) {
                 if (existingItem.qty + currentDetailQty <= selectedFlavor.stock) {
                     existingItem.qty += currentDetailQty;
-                } else {
-                    existingItem.qty = selectedFlavor.stock;
-                }
+                } else { existingItem.qty = selectedFlavor.stock; }
             } else {
-                cart.push({
-                    id: currentProduct.id,
-                    name: currentProduct.name,
-                    price: currentProduct.price,
-                    flavor: selectedFlavor.name,
-                    qty: currentDetailQty
-                });
+                cart.push({ id: currentProduct.id, name: currentProduct.name, price: currentProduct.price, flavor: selectedFlavor.name, qty: currentDetailQty });
             }
-
             localStorage.setItem('waka_cart', JSON.stringify(cart));
             updateCartCount();
             closeDetailsForce();
@@ -487,28 +440,101 @@
             updateCartCount(); toggleCart(); toggleCart();
         }
 
-        function checkout() {
+        // --- НОВЫЕ ФУНКЦИИ ОКНА ОФОРМЛЕНИЯ ЗАКАЗА ИЗ ЧЕТВЕРТОГО СКРИНШОТА ---
+        function openOrderCheckout() {
             if (!cart.length) return;
-            const itemsText = cart.map(i => `${i.name} (Вкус: ${i.flavor}, Кол-во: ${i.qty}шт)`).join(', ');
-            const finalSum = document.getElementById('cart-total').innerText;
-            tg.showConfirm(`Оформить заказ на сумму ${finalSum} сом?`, (agreed) => {
+            document.getElementById('cart-modal').classList.add('hidden');
+
+            let subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            let discount = currentBalance; // Весь баланс с колеса уходит в скидку
+            if (discount > subtotal) discount = subtotal; // Скидка не может быть больше суммы заказа
+            let finalTotal = subtotal - discount;
+
+            document.getElementById('summary-subtotal').innerText = subtotal;
+            document.getElementById('summary-discount').innerText = discount;
+            document.getElementById('summary-total').innerText = finalTotal;
+
+            // Заполнение даты и времени точь-в-точь по макету
+            const now = new Date();
+            const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+            document.getElementById('checkout-date-box').innerText = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()} г.`;
+            
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // 0 преобразуем в 12
+            document.getElementById('checkout-time-box').innerText = `${hours}:${minutes} ${ampm}`;
+
+            document.getElementById('checkout-back').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('checkout-sheet').classList.add('active'); }, 10);
+        }
+
+        function closeCheckoutForce() {
+            document.getElementById('checkout-sheet').classList.remove('active');
+            setTimeout(() => { document.getElementById('checkout-back').classList.add('hidden'); }, 300);
+        }
+
+        function closeCheckout(event) {
+            if (event.target === document.getElementById('checkout-back')) closeCheckoutForce();
+        }
+
+        function submitOrderFinal() {
+            const phone = document.getElementById('checkout-phone').value.trim();
+            const address = document.getElementById('checkout-address').value.trim();
+            const dateStr = document.getElementById('checkout-date-box').innerText;
+            const timeStr = document.getElementById('checkout-time-box').innerText;
+            
+            if (!address) {
+                alert('Пожалуйста, введите адрес доставки!');
+                return;
+            }
+
+            let subtotal = document.getElementById('summary-subtotal').innerText;
+            let discount = document.getElementById('summary-discount').innerText;
+            let finalTotal = document.getElementById('summary-total').innerText;
+
+            const itemsText = cart.map(i => `${i.name} (${i.flavor} — ${i.qty}шт)`).join(', ');
+
+            tg.showConfirm(`Подтвердить заказ на сумму ${finalTotal} сом?`, (agreed) => {
                 if (agreed) {
-                    cart = []; localStorage.removeItem('waka_cart'); updateCartCount();
-                    tg.sendData(JSON.stringify({ order: itemsText, total: finalSum }));
+                    // Списываем использованные бонусы
+                    currentBalance -= parseInt(discount);
+                    localStorage.setItem('waka_balance', currentBalance);
+                    document.getElementById('user-balance').innerText = currentBalance;
+
+                    // Отправка структурированных данных боту
+                    const orderData = {
+                        phone: phone,
+                        address: address,
+                        date: dateStr,
+                        time: timeStr,
+                        items: itemsText,
+                        subtotal: subtotal,
+                        discount: discount,
+                        total: finalTotal
+                    };
+
+                    tg.sendData(JSON.stringify(orderData));
+                    
+                    cart = [];
+                    localStorage.removeItem('waka_cart');
+                    updateCartCount();
+                    closeCheckoutForce();
                     tg.close();
                 }
             });
         }
 
-        // --- КОЛЕСО ФОРТУНЫ С ЖЕСТКИМИ РЕАЛЬНЫМИ ШАНСАМИ (65% / 20% / 10% / 5%) ---
+        // --- КОЛЕСО ФОРТУНЫ (ШЕНСЫ 65/20/10/5) ---
         const canvas = document.getElementById('wheelCanvas');
         const ctx = canvas.getContext('2d');
         
         const prizes = [
-            { text: "50 сом", value: 50, color: "#1d1b3a", weight: 65 },   // 65% шанс
-            { text: "100 сом", value: 100, color: "#2d1f4d", weight: 20 }, // 20% шанс
-            { text: "300 сом", value: 300, color: "#422375", weight: 10 }, // 10% шанс
-            { text: "500 сом", value: 500, color: "#581c87", weight: 5 }   // 5% шанс
+            { text: "50 сом", value: 50, color: "#1d1b3a", weight: 65 },
+            { text: "100 сом", value: 100, color: "#2d1f4d", weight: 20 },
+            { text: "300 сом", value: 300, color: "#422375", weight: 10 },
+            { text: "500 сом", value: 500, color: "#581c87", weight: 5 }
         ];
         
         const numSectors = prizes.length;
@@ -540,21 +566,16 @@
             return 0;
         }
 
-        // Проверка таймера 24 часов
         function checkWheelTimer() {
             const lastSpin = localStorage.getItem('waka_last_spin');
             const btn = document.getElementById('spin-btn');
-            
             if (lastSpin) {
                 const passed = Date.now() - parseInt(lastSpin);
                 const dayMs = 24 * 60 * 60 * 1000;
-                
                 if (passed < dayMs) {
                     btn.disabled = true;
                     btn.classList.add('opacity-50');
-                    
                     if (timerInterval) clearInterval(timerInterval);
-                    
                     timerInterval = setInterval(() => {
                         const remaining = dayMs - (Date.now() - parseInt(lastSpin));
                         if (remaining <= 0) {
@@ -581,7 +602,6 @@
         function spinWheel() {
             if (isSpinning || !checkWheelTimer()) return;
             isSpinning = true;
-            
             const btn = document.getElementById('spin-btn');
             btn.innerText = "⏳ Колесо крутится...";
 
@@ -596,28 +616,21 @@
             setTimeout(() => {
                 isSpinning = false;
                 const finalPrize = prizes[winIndex];
-                
                 currentBalance += finalPrize.value;
                 localStorage.setItem('waka_balance', currentBalance);
-                localStorage.setItem('waka_last_spin', Date.now().toString()); // Записываем точное время спина
-                
+                localStorage.setItem('waka_last_spin', Date.now().toString());
                 document.getElementById('user-balance').innerText = currentBalance;
                 
-                alert(`🎉 Супер! Вы выиграли ${finalPrize.text}! Бонусы успешно начислены на баланс.`);
+                alert(`🎉 Супер! Вы выиграли ${finalPrize.text}! Бонусы начислены.`);
                 
                 canvas.style.transition = 'none'; 
                 canvas.style.transform = `rotate(${stopAngle % 360}deg)`;
                 setTimeout(() => { canvas.style.transition = 'transform 5s ease-out'; }, 50);
-                
-                checkWheelTimer(); // Включаем таймер блокировки
+                checkWheelTimer();
             }, 5000);
         }
 
-        // Инициализация при старте страницы
-        drawWheel(); 
-        renderProducts(); 
-        updateCartCount();
-        checkWheelTimer();
+        drawWheel(); renderProducts(); updateCartCount(); checkWheelTimer();
     </script>
 </body>
 </html>
