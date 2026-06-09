@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WAKA ZYNK</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0b0e14;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .active-tab {
+            color: #a855f7;
+        }
+        .cart-badge { animation: pop 0.3s ease-out; }
+        @keyframes pop { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    </style>
+</head>
+<body class="select-none overflow-x-hidden pb-24">
+
+    <div id="disclaimer" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-end justify-center p-4">
+        <div class="bg-[#131924] w-full max-w-md rounded-3xl p-6 border border-gray-800 space-y-6">
+            <div class="flex items-center space-x-3 text-amber-500 text-xl font-bold">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <h2>Важные условия покупки</h2>
+            </div>
+            <p class="text-xs text-gray-400">Подтвердите перед входом в магазин</p>
+            
+            <div class="space-y-3">
+                <div class="bg-red-950/30 border border-red-900/50 rounded-2xl p-4 flex gap-3">
+                    <i class="fa-solid fa-circle-xmark text-red-400 mt-1"></i>
+                    <div>
+                        <h4 class="font-semibold text-sm text-red-200">Возврата денег нет</h4>
+                        <p class="text-xs text-gray-400 mt-0.5">After покупки возврат денежных средств не производится.</p>
+                    </div>
+                </div>
+                <div class="bg-blue-950/30 border border-blue-900/50 rounded-2xl p-4 flex gap-3">
+                    <i class="fa-solid fa-circle-check text-blue-400 mt-1"></i>
+                    <div>
+                        <h4 class="font-semibold text-sm text-blue-200">Замена только при браке</h4>
+                        <p class="text-xs text-gray-400 mt-0.5">Замена возможна только при подтвержденном браке товара.</p>
+                    </div>
+                </div>
+                <div class="bg-amber-950/30 border border-amber-900/50 rounded-2xl p-4 flex gap-3">
+                    <i class="fa-solid fa-user-shield text-amber-400 mt-1"></i>
+                    <div>
+                        <h4 class="font-semibold text-sm text-amber-200">Покупка только от 18+</h4>
+                        <p class="text-xs text-gray-400 mt-0.5">Нажимая "Хорошо", вы подтверждаете, что вам есть 18 лет.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-[#1a2232] px-4 py-3 rounded-2xl">
+                <span class="text-sm text-gray-300">Не показывать снова</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="dont-show" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                </label>
+            </div>
+
+            <button onclick="closeDisclaimer()" class="w-full bg-white text-black font-bold py-4 rounded-2xl text-center active:scale-95 transition-transform cursor-pointer">
+                Хорошо
+            </button>
+        </div>
+    </div>
+
+    <header class="p-4 flex items-center justify-between border-b border-gray-900 bg-[#0f131c] sticky top-0 z-30">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center font-bold text-sm tracking-wider shadow-[0_0_15px_rgba(168,85,247,0.4)]">
+                WAKA
+            </div>
+            <div>
+                <h1 class="font-bold text-base tracking-wide">WAKA ZYNK</h1>
+                <p class="text-xs text-gray-400">топовый завоз в сомах</p>
+            </div>
+        </div>
+        <button onclick="toggleCart()" class="relative w-10 h-10 rounded-xl bg-[#171e2c] flex items-center justify-center text-gray-300 active:scale-95 transition-transform cursor-pointer">
+            <i class="fa-solid fa-shopping-cart text-sm"></i>
+            <span id="cart-count" class="hidden absolute -top-1 -right-1 bg-purple-600 text-[10px] font-bold w-5 h-5 rounded-full border-2 border-[#0f131c] flex items-center justify-center">0</span>
+        </button>
+    </header>
+
+    <div id="cart-modal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm z-50 p-4 flex items-center justify-center">
+        <div class="bg-[#131924] w-full max-w-md rounded-3xl p-6 border border-gray-800 flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Ваш заказ</h2>
+                <button onclick="toggleCart()" class="text-gray-500 text-2xl hover:text-white">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto space-y-3 pr-1">
+                </div>
+            <div class="border-t border-gray-800 mt-4 pt-4 space-y-4">
+                <div class="flex justify-between font-bold text-lg">
+                    <span>Итого к оплате:</span>
+                    <span><span id="cart-total">0</span> сом</span>
+                </div>
+                <button onclick="checkout()" class="w-full bg-purple-600 font-bold py-4 rounded-2xl active:scale-95 transition-all text-center cursor-pointer">
+                    Оформить заказ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <main id="tab-catalog" class="p-4 space-y-4">
+        <div class="flex items-baseline justify-between">
+            <h2 class="text-2xl font-bold">Каталог</h2>
+            <span id="product-count" class="text-xs text-gray-400">4 товара</span>
+        </div>
+
+        <div class="flex space-x-2 overflow-x-auto pb-1">
+            <button onclick="filterProducts('all', this)" id="filter-all" class="bg-purple-600 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors">Все</button>
+            <button onclick="filterProducts('instock', this)" id="filter-instock" class="bg-[#171e2c] text-gray-400 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors">В наличии</button>
+            <button onclick="filterProducts('soon', this)" id="filter-soon" class="bg-[#171e2c] text-gray-400 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors">Скоро</button>
+        </div>
+
+        <div id="catalog-grid" class="grid grid-cols-2 gap-3">
+            </div>
+    </main>
+
+    <main id="tab-bonuses" class="p-4 hidden space-y-6 text-center">
+        <div class="text-left">
+            <h2 class="text-2xl font-bold">Колесо Фортуны</h2>
+            <p class="text-xs text-gray-400 mt-1">Крути колесо удачи раз в сутки и выигрывай сомы на баланс!</p>
+        </div>
+        
+        <div class="relative w-76 h-76 mx-auto my-4 flex items-center justify-center">
+            <div class="absolute top-0 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[25px] border-t-purple-500 z-30 filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)]"></div>
+            <canvas id="wheelCanvas" width="290" height="290" class="rounded-full shadow-[0_0_30px_rgba(168,85,247,0.25)] border-4 border-[#171e2c] transition-transform duration-5000 ease-out"></canvas>
+            <div class="absolute w-14 h-14 bg-[#0b0e14] border-2 border-purple-500 rounded-full text-white font-black flex items-center justify-center text-[10px] tracking-wide shadow-lg z-20 select-none">WAKA</div>
+        </div>
+
+        <button onclick="spinWheel()" id="spin-btn" class="w-full max-w-sm bg-gradient-to-r from-purple-600 to-indigo-600 font-bold py-4 rounded-2xl active:scale-95 transition-all shadow-[0_4px_15px_rgba(168,85,247,0.3)] cursor-pointer">
+            ⚡ Испытать удачу
+        </button>
+
+        <div class="bg-[#121824] p-5 rounded-3xl border border-gray-900 text-center space-y-4 mt-4">
+            <div class="w-16 h-16 bg-purple-950/50 rounded-2xl flex items-center justify-center text-purple-400 text-2xl mx-auto shadow-inner">
+                <i class="fa-solid fa-bullhorn"></i>
+            </div>
+            <div>
+                <h3 class="font-bold text-lg">Будь в курсе всех событий!</h3>
+                <p class="text-xs text-gray-400 mt-2 leading-relaxed">
+                    Подписывайся на наш официальный Telegram-канал, чтобы не пропустить новые завозы, закрытые скидки и розыгрыши!
+                </p>
+            </div>
+            <a href="https://t.me/твой_канал" target="_blank" class="block w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-2xl transition-colors active:scale-95 text-center">
+                📢 Подписаться на канал
+            </a>
+        </div>
+    </main>
+
+    <main id="tab-profile" class="p-4 hidden space-y-4">
+        <div class="flex items-center space-x-4 bg-[#121824] p-4 rounded-2xl border border-gray-900">
+            <div class="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center text-xl font-bold text-white">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div>
+                <h3 id="user-name" class="font-bold text-base">Пользователь</h3>
+                <p id="user-id" class="text-xs text-gray-500">ID: 0000000000</p>
+            </div>
+        </div>
+
+        <div class="bg-[#121824] p-5 rounded-2xl border border-gray-900 flex justify-between items-center">
+            <div>
+                <p class="text-xs text-gray-400">Ваш баланс</p>
+                <p class="text-3xl font-black mt-1"><span id="user-balance">0</span> <span class="text-sm font-normal text-gray-400">сом</span></p>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-purple-950/50 flex items-center justify-center text-purple-400 text-lg">
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div class="bg-[#121824] p-4 rounded-2xl border border-gray-900">
+                <p class="text-xs text-gray-400">Всего заказов</p>
+                <p class="text-2xl font-bold mt-1">0</p>
+            </div>
+            <div class="bg-[#121824] p-4 rounded-2xl border border-gray-900">
+                <p class="text-xs text-gray-400">Рефералов</p>
+                <p class="text-2xl font-bold mt-1">0</p>
+            </div>
+        </div>
+    </main>
+
+    <nav class="fixed bottom-0 inset-x-0 bg-[#0f131c]/95 backdrop-blur-md border-t border-gray-900 flex justify-around py-3 text-gray-500 text-[10px] font-semibold z-40">
+        <button onclick="switchTab('bonuses')" id="btn-bonuses" class="flex flex-col items-center space-y-1 w-20 transition-colors">
+            <i class="fa-solid fa-gift text-lg"></i>
+            <span>Бонусы</span>
+        </button>
+        <button onclick="switchTab('catalog')" id="btn-catalog" class="flex flex-col items-center space-y-1 w-20 active-tab transition-colors">
+            <i class="fa-solid fa-cubes text-lg"></i>
+            <span>Каталог</span>
+        </button>
+        <button onclick="switchTab('profile')" id="btn-profile" class="flex flex-col items-center space-y-1 w-20 transition-colors">
+            <i class="fa-solid fa-user text-lg"></i>
+            <span>Профиль</span>
+        </button>
+    </nav>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let currentBalance = 0;
+        let cart = [];
+
+        if (localStorage.getItem('hideDisclaimer') === 'true') {
+            document.getElementById('disclaimer').classList.add('hidden');
+        }
+
+        function closeDisclaimer() {
+            if (document.getElementById('dont-show').checked) {
+                localStorage.setItem('hideDisclaimer', 'true');
+            }
+            document.getElementById('disclaimer').classList.add('hidden');
+        }
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('user-name').innerText = user.first_name + (user.last_name ? ' ' + user.last_name : '');
+            document.getElementById('user-id').innerText = 'ID: ' + user.id;
+        }
+
+        function switchTab(tabName) {
+            document.getElementById('tab-catalog').classList.add('hidden');
+            document.getElementById('tab-bonuses').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('hidden');
+
+            document.getElementById('btn-catalog').classList.remove('active-tab');
+            document.getElementById('btn-bonuses').classList.remove('active-tab');
+            document.getElementById('btn-profile').classList.remove('active-tab');
+
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            document.getElementById('btn-' + tabName).classList.add('active-tab');
+        }
+
+        // ПОЛНЫЙ МАССИВ ТОВАРОВ
+        const products = [
+            { id: 1, name: "WAKA 20000", price: 2300, oldPrice: 2700, discount: "-15%", stock: 74, status: "instock", img: "https://picsum.photos/id/20/300/300" },
+            { id: 2, name: "WAKA 30000", price: 2400, oldPrice: 2600, discount: "-8%", stock: 18, status: "instock", img: "https://picsum.photos/id/26/300/300" },
+            { id: 3, name: "WAKA Mirror", price: 2100, oldPrice: 2500, discount: "-16%", stock: 0, status: "soon", img: "https://picsum.photos/id/30/300/300" },
+            { id: 4, name: "WAKA Smash", price: 1900, oldPrice: 2200, discount: "-13%", stock: 42, status: "instock", img: "https://picsum.photos/id/48/300/300" }
+        ];
+
+        function renderProducts(filterType = 'all') {
+            const grid = document.getElementById('catalog-grid');
+            grid.innerHTML = '';
+            
+            const filtered = products.filter(p => filterType === 'all' || p.status === filterType);
+            document.getElementById('product-count').innerText = `${filtered.length} ${getNoun(filtered.length, 'товар', 'товара', 'товаров')}`;
+
+            filtered.forEach(p => {
+                const badgeColor = p.status === 'instock' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/20 text-amber-400 border border-amber-500/30';
+                const badgeText = p.status === 'instock' ? 'В наличии' : 'Скоро';
+                const stockText = p.status === 'instock' ? `📦 В наличии: ${p.stock} шт.` : `⏳ Ожидается завоз`;
+
+                // Показываем кнопку добавления только если товар в наличии
+                const actionButton = p.status === 'instock' 
+                    ? `<button onclick="addToCart(${p.id})" class="bg-purple-600 hover:bg-purple-700 w-9 h-9 rounded-xl flex items-center justify-center font-bold text-base active:scale-90 transition-transform cursor-pointer">+</button>`
+                    : `<span class="text-[10px] text-amber-500 font-semibold bg-amber-500/10 px-2 py-1 rounded-lg">Ждем</span>`;
+
+                grid.innerHTML += `
+                    <div class="bg-[#121824] rounded-2xl border border-gray-900 overflow-hidden relative flex flex-col">
+                        <span class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-lg z-10">${p.discount}</span>
+                        <span class="absolute top-2 right-2 ${badgeColor} text-[9px] font-bold px-2 py-0.5 rounded-lg z-10">${badgeText}</span>
+                        
+                        <div class="w-full aspect-square bg-[#171e2c] flex items-center justify-center p-4">
+                            <img src="${p.img}" alt="${p.name}" class="rounded-xl object-cover max-h-full">
+                        </div>
+
+                        <div class="p-3 flex-1 flex flex-col justify-between space-y-3">
+                            <div>
+                                <h3 class="font-bold text-sm tracking-wide">${p.name}</h3>
+                                <p class="text-[10px] text-gray-400 mt-1">${stockText}</p>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-baseline space-x-0.5">
+                                    <span class="text-base font-black text-white">${p.price}</span>
+                                    <span class="text-[9px] text-gray-400">сом</span>
+                                    <span class="text-[10px] text-gray-500 line-through ml-1">${p.oldPrice}</span>
+                                </div>
+                                ${actionButton}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function filterProducts(type, buttonElement) {
+            ['filter-all', 'filter-instock', 'filter-soon'].forEach(id => {
+                const btn = document.getElementById(id);
+                btn.className = "bg-[#171e2c] text-gray-400 px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors";
+            });
+            buttonElement.className = "bg-purple-600 text-white px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap cursor-pointer transition-colors";
+            renderProducts(type);
+        }
+
+        // СБОРКА КОРЗИНЫ И СЧЕТЧИКИ
+        function addToCart(id) {
+            const product = products.find(p => p.id === id);
+            cart.push(product);
+            updateCartCount();
+            if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+        }
+
+        function updateCartCount() {
+            const countBadge = document.getElementById('cart-count');
+            countBadge.innerText = cart.length;
+            countBadge.classList.toggle('hidden', cart.length === 0);
+            
+            countBadge.classList.add('cart-badge');
+            setTimeout(() => countBadge.classList.remove('cart-badge'), 300);
+        }
+
+        function toggleCart() {
+            const modal = document.getElementById('cart-modal');
+            if (modal.classList.contains('hidden')) {
+                const container = document.getElementById('cart-items');
+                container.innerHTML = cart.length ? '' : '<p class="text-center text-gray-500 py-12 text-sm">Ваша корзина пуста...</p>';
+                
+                let totalPrice = 0;
+                cart.forEach((item, index) => {
+                    totalPrice += item.price;
+                    container.innerHTML += `
+                        <div class="flex justify-between items-center bg-[#1a2232] p-3 rounded-2xl border border-gray-800/40">
+                            <span class="text-sm font-bold tracking-wide">${item.name}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-black text-purple-400">${item.price} с.</span>
+                                <button onclick="removeFromCart(${index})" class="text-red-400 text-xl font-bold px-2 active:scale-75 transition-transform">&times;</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('cart-total').innerText = totalPrice;
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            toggleCart(); toggleCart(); // быстрый хак для обновления содержимого модалки
+        }
+
+        function checkout() {
+            if (!cart.length) return;
+            const itemsText = cart.map(i => i.name).join(', ');
+            const finalSum = document.getElementById('cart-total').innerText;
+            
+            if(tg.showConfirm) {
+                tg.showConfirm(`Подтверждаете оформление заказа на сумму ${finalSum} сом?`, (agreed) => {
+                    if (agreed) {
+                        tg.sendData(JSON.stringify({ order: itemsText, total: finalSum }));
+                        tg.close();
+                    }
+                });
+            } else {
+                alert(`Заказ на сумму ${finalSum} сом успешно оформлен в тестовом режиме!`);
+            }
+        }
+
+        function getNoun(number, one, two, many) {
+            let n = Math.abs(number) % 100;
+            if (n >= 5 && n <= 20) return many;
+            n %= 10;
+            if (n === 1) return one;
+            if (n >= 2 && n <= 4) return two;
+            return many;
+        }
+
+        // --- КОЛЕСО ФОРТУНЫ (ПОЛНАЯ ВЕРСИЯ: 6 СЕКТОРОВ) ---
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        const prizes = [
+            { text: "0 сом", value: 0, color: "#131924" },
+            { text: "50 сом", value: 50, color: "#1d1b3a" },
+            { text: "0 сом", value: 0, color: "#131924" },
+            { text: "100 сом", value: 100, color: "#2d1f4d" },
+            { text: "0 сом", value: 0, color: "#131924" },
+            { text: "200 сом", value: 200, color: "#422375" }
+        ];
+
+        const numSectors = prizes.length;
+        const arcSize = (2 * Math.PI) / numSectors;
+        let isSpinning = false;
+
+        function drawWheel() {
+            const size = canvas.width;
+            const center = size / 2;
+            ctx.clearRect(0, 0, size, size);
+
+            for (let i = 0; i < numSectors; i++) {
+                const angle = i * arcSize;
+                ctx.fillStyle = prizes[i].color;
+                
+                ctx.beginPath();
+                ctx.moveTo(center, center);
+                ctx.arc(center, center, center - 5, angle, angle + arcSize);
+                ctx.lineTo(center, center);
+                ctx.fill();
+                ctx.strokeStyle = '#272d3d';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.save();
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 12px sans-serif";
+                ctx.translate(center, center);
+                ctx.rotate(angle + arcSize / 2);
+                ctx.textAlign = "right";
+                ctx.fillText(prizes[i].text, center - 25, 4);
+                ctx.restore();
+            }
+        }
+
+        function spinWheel() {
+            if (isSpinning) return;
+            isSpinning = true;
+
+            const btn = document.getElementById('spin-btn');
+            btn.innerText = "⏳ Колесо крутится...";
+            btn.classList.add('opacity-50');
+
+            const winIndex = Math.floor(Math.random() * numSectors);
+            const stopAngle = (5 * 360) + (360 - (winIndex * (360 / numSectors)) - (180 / numSectors));
+
+            canvas.style.transform = `rotate(${stopAngle}deg)`;
+
+            setTimeout(() => {
+                isSpinning = false;
+                btn.innerText = "⚡ Испытать удачу";
+                btn.classList.remove('opacity-50');
+
+                const finalPrize = prizes[winIndex];
+                
+                if (finalPrize.value > 0) {
+                    currentBalance += finalPrize.value;
+                    document.getElementById('user-balance').innerText = currentBalance;
+                    alert(`🎉 Поздравляем! Вы выиграли ${finalPrize.text}! Деньги зачислены на баланс.`);
+                } else {
+                    alert("😢 К сожалению, в этот раз пусто. Попробуйте завтра!");
+                }
+
+                canvas.style.transition = 'none';
+                canvas.style.transform = `rotate(${stopAngle % 360}deg)`;
+                setTimeout(() => { canvas.style.transition = 'transform 5s ease-out'; }, 50);
+
+            }, 5000);
+        }
+
+        // Старт
+        drawWheel();
+        renderProducts('all');
+    </script>
+</body>
+</html>
